@@ -3,16 +3,18 @@ import os
 import scipy.io as scio
 from torch.utils.data import Dataset
 
-def normalize(data):                           # 归一化到0-255
+
+def normalize(data):  # 归一化到0-255
     rawdata_max = max(map(max, data))
     rawdata_min = min(map(min, data))
     for i in range(data.shape[0]):
         for j in range(data.shape[1]):
-            data[i][j] = round(((255 - 0) * (data[i][j] - rawdata_min) / (rawdata_max - rawdata_min)) + 0)
+            data[i][j] = round(((255 - 0) * (data[i][j] - rawdata_min) /
+                                (rawdata_max - rawdata_min)) + 0)
     return data
 
-class MyDataset(Dataset):
 
+class MyDataset(Dataset):
     def __init__(self, root_dir, names_file, transform=None):
         self.root_dir = root_dir
         self.names_file = names_file
@@ -35,7 +37,7 @@ class MyDataset(Dataset):
             print(data_path + 'does not exist!')
             return None
         rawdata = scio.loadmat(data_path)['data']  # 10000,12 uint16
-        rawdata = rawdata.astype(int)       # int32
+        rawdata = rawdata.astype(int)  # int32
         data = normalize(rawdata)
         label = int(self.names_list[idx].split(' ')[1])
         sample = {'data': data, 'label': label}
