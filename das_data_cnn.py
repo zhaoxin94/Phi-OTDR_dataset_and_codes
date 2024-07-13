@@ -37,7 +37,7 @@ def test(model, dataset, criterion):
     val_loss = 0
     prediction = []
     labels = []
-    feature_list = torch.tensor([])  # test总数，特征数
+    feature_list = torch.tensor([]).cuda()  # test总数，特征数
     for (step, i) in enumerate(dataset):
         total_batch_num = total_batch_num + 1
         batch_x = i['data']
@@ -150,7 +150,6 @@ def draw_result(C):
 
 
 def main(args):
-
     #划分训练集、测试集
     train_dataset = MyDataset(args.root, args.txtpath, transform=None)
     train_loader = DataLoader(dataset=train_dataset,
@@ -188,6 +187,7 @@ def main(args):
             if torch.cuda.is_available():
                 batch_x = batch_x.cuda()
                 batch_y = batch_y.cuda()
+                print('111')
             tlabels, tpredi, tloss = train(model, batch_x, batch_y, optimizer,
                                            criterion)
             runloss = runloss + tloss
@@ -201,6 +201,7 @@ def main(args):
         train_loss_list.append(loss)
         acc_score, loss_score, feature_list, C = test(model, test_loader,
                                                       criterion)
+        print('why')
         print("Epoch %d Val_accuracy %.3f Val_loss %.3f" %
               (epoch, acc_score, loss_score))
         test_acc_list.append(acc_score)
@@ -211,7 +212,7 @@ def main(args):
             # acc_score, loss_score, NAR, feature_list = test(the_model, test_loader, criterion)
             # print("Epoch %d Train_accuracy %.3f Train_loss %.3f Val_accuracy %.3f Val_loss %.3f NAR %.3f "
             #       % (epoch, taccuracy, loss, acc_score, loss_score, NAR))
-            feature_list = feature_list.detach().numpy()
+            feature_list = feature_list.detach().cpu().numpy()
             np.savetxt('feature_data.csv', feature_list,
                        delimiter=',')  # 保存特征向量
             draw_result(C)
@@ -220,7 +221,6 @@ def main(args):
 
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser(description="CNN fou classification")
     '''save model'''
     parser.add_argument("--save",
